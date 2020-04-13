@@ -1,0 +1,58 @@
+- name: Update and upgrade all apt packages
+  become: true
+  apt:
+    upgrade: dist
+    update_cache: yes
+- name: Install common packages
+  become: true
+  apt: 
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+    force_apt_get: yes
+  loop: 
+    - 'aptitude'
+    - 'apt-transport-https'
+    - 'ca-certificates'
+    - 'curl'
+    - 'software-properties-common'
+    - 'python3-pip'
+    - 'virtualenv'
+    - 'python3-setuptools'
+- name: Add docker gpg apt key
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+- name: Add docker depository
+  become: true
+  apt_repository:
+    repo: deb https://download.docker.com/linux/ubuntu bionic stable
+    state: present
+- name: Install docker-ce package
+  become: true
+  apt: 
+    name: docker-ce 
+    update_cache: yes
+    state: latest
+- name: Add docker group
+  become: true
+  group:
+    name: docker
+    state: present
+- name: Add vagrant user to docker group
+  become: true
+  user:
+    name: vagrant
+    groups: 
+      - docker
+- name: Restart docker service
+  become: true
+  service:
+    name: docker
+    state: restarted
+- name: Install common pip modules
+  pip:
+    name: "{{ item }}"
+  loop:
+    - 'docker'

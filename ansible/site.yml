@@ -1,0 +1,9 @@
+- hosts: all
+  roles:
+    - role: common
+- hosts: rke_master_servers
+  roles:
+    - role: rke_master
+- hosts: rke_worker_servers
+  roles:
+    - role: rke_worker
