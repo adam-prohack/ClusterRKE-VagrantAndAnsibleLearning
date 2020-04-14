@@ -1,16 +1,30 @@
 Vagrant.require_version ">= 2.2"
 
 NETWORK_NAME = "rke-cluster"
-NETWORK_IP_BASE = "10.101"
+NETWORK_IP_BASE = "192.168.0"
 MACHINE_HOSTNAME_PREFIX = "rke"
-WORKER_NODES = 3
+WORKER_NODES = 2
 
 Vagrant.configure("2") do |config|
-    config.vm.box = "ubuntu/focal64"
+    config.vm.box = "debian/buster64"
+
+    # Configure virtualbox provider
+    config.vm.provider "virtualbox" do |provider|
+        provider.gui = false
+        provider.linked_clone = true
+
+        provider.customize ["modifyvm", :id, "--ostype", "Linux24_64"]
+        provider.customize ["modifyvm", :id, "--ioapic", "on"]
+        provider.customize ["modifyvm", :id, "--acpi", "on"]
+        provider.customize ["modifyvm", :id, "--pae", "on"]
+        provider.customize ["modifyvm", :id, "--chipset", "ich9"]
+        provider.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
+        provider.customize ["modifyvm", :id, "--accelerate3d", "off"]
+        provider.customize ["modifyvm", :id, "--accelerate2dvideo", "off"]
+    end
 
     # Configure vagrant
     config.vm.synced_folder '.', '/vagrant', disabled: true
-    config.vagrant.plugins = []
 
     # Configure ssh keys
     config.ssh.private_key_path = ["keys/id_rsa", "~/.vagrant.d/insecure_private_key"]
@@ -23,11 +37,10 @@ Vagrant.configure("2") do |config|
     (1..WORKER_NODES).each do |node_id|
         config.vm.define "node-#{node_id}" do |worker_node|
             worker_node.vm.provider "virtualbox" do |provider|
-                provider.gui = false
-                provider.memory = 1024 * 3
-                provider.cpus = 1
+                provider.memory = 1024 * 4
+                provider.cpus = 2
             end
-            worker_node.vm.network "private_network", ip: "#{NETWORK_IP_BASE}.1.#{100+node_id}", virtualbox__intnet: NETWORK_NAME
+            worker_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.#{200+node_id}"
             worker_node.vm.network "forwarded_port", guest: 22, host: 3100+node_id, id: 'ssh'
             worker_node.vm.hostname = "#{MACHINE_HOSTNAME_PREFIX}-node-#{node_id}"
         end
@@ -36,11 +49,10 @@ Vagrant.configure("2") do |config|
     # Configure master
     config.vm.define "master" do |master_node|
         master_node.vm.provider "virtualbox" do |provider|
-            provider.gui = false
-            provider.memory = 1024 * 4
-            provider.cpus = 1
+            provider.memory = 1024 * 5
+            provider.cpus = 2
         end
-        master_node.vm.network "private_network", ip: "#{NETWORK_IP_BASE}.1.100", virtualbox__intnet: NETWORK_NAME
+        master_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.200"
         master_node.vm.network "forwarded_port", guest: 22, host: 3100, id: 'ssh'
         master_node.vm.hostname = "#{MACHINE_HOSTNAME_PREFIX}-master"
     end
