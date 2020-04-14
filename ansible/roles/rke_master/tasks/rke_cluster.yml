@@ -1,0 +1,21 @@
+- name: Create cluster directory
+  file:
+    path: /home/$USER/cluster
+    state: directory
+    mode: '0766'
+- name: Create cluster.yml file
+  template:
+    src: cluster.j2
+    dest: /home/$USER/cluster/cluster.yml
+    mode: '0655'
+- name: Create RKE cluster
+  shell: rke up
+  args:
+    chdir: /home/$USER/cluster/
+- name: Copy kubectl config
+  become: yes
+  copy:
+    src: /home/vagrant/cluster/kube_config_cluster.yml
+    dest: /home/vagrant/.kube/config
+    remote_src: yes
+    mode: '0655'

@@ -1,0 +1,26 @@
+- name: Download helm
+  become: true
+  unarchive:
+    src: https://get.helm.sh/helm-{{ helm_version }}-linux-amd64.tar.gz
+    dest: /tmp/
+    remote_src: yes
+    mode: '777'
+- name: Copy helm executable into /usr/local/bin
+  become: true
+  copy:
+    src: /tmp/linux-amd64/helm
+    remote_src: true
+    dest: /usr/local/bin/helm
+    mode: '0777'
+- name: Copy tiller executable into /usr/local/bin
+  become: true
+  copy:
+    src: /tmp/linux-amd64/tiller
+    remote_src: true
+    dest: /usr/local/bin/tiller
+    mode: '0777'
+- name: Delete tmp helm directory
+  become: true
+  file:
+    path: /tmp/linux-amd64
+    state: absent

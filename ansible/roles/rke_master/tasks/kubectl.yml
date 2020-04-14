@@ -1,0 +1,11 @@
+- name: Create user kubectl directory
+  file:
+    path: /home/$USER/.kube
+    state: directory
+    mode: '0777'
+- name: Download kubectl
+  become: true
+  get_url:
+    url: https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+    dest: /usr/local/bin/kubectl
+    mode: '0777'

@@ -1,38 +1,8 @@
-- name: Create cluster directory
-  file:
-    path: /home/$USER/cluster
-    state: directory
-    mode: '0766'
-- name: Download RKE {{ rke_version }}
-  become: true
-  get_url:
-    url: https://github.com/rancher/rke/releases/download/{{ rke_version }}/rke_linux-amd64
-    dest: /usr/local/bin/rke
-    mode: '0777'
-- name: Download kubectl
-  become: true
-  get_url:
-    url: https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
-    dest: /usr/local/bin/kubectl
-    mode: '0777'
-- name: Create cluster.yml file
-  template:
-    src: cluster.j2
-    dest: /home/$USER/cluster/cluster.yml
-    mode: '0655'
-- name: Create RKE cluster
-  shell: rke up
-  args:
-    chdir: /home/$USER/cluster/
-- name: Pull rancher server container
-  docker_image:
-    name: "rancher/rancher:{{ rancher_server_version }}"
-    source: pull
-- name: Run rancher server container
-  docker_container:
-    name: rancher_server
-    image: "rancher/rancher:{{ rancher_server_version }}"
-    state: started
-    ports:
-      - "443:443"
-      - "80:80"
+- name: Include kubectl install tasks
+  include: kubectl.yml
+- name: Include helm install tasks
+  include: helm.yml
+- name: Include rke install tasks
+  include: rke.yml
+- name: Include create cluster tasks
+  include: rke_cluster.yml

@@ -4,6 +4,7 @@ nodes:
   role:
   - controlplane
   - etcd
+  - worker
   user: vagrant
   docker_socket: /var/run/docker.sock
   ssh_key_path: /home/vagrant/.ssh/id_rsa
@@ -13,6 +14,7 @@ nodes:
   port: "22"
   role:
   - worker
+  - etcd
   user: vagrant
   docker_socket: /var/run/docker.sock
   ssh_key_path: /home/vagrant/.ssh/id_rsa
