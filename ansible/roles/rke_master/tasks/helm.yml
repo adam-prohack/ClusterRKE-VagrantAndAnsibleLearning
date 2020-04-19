@@ -12,13 +12,6 @@
     remote_src: true
     dest: /usr/local/bin/helm
     mode: '0777'
-- name: Copy tiller executable into /usr/local/bin
-  become: true
-  copy:
-    src: /tmp/linux-amd64/tiller
-    remote_src: true
-    dest: /usr/local/bin/tiller
-    mode: '0777'
 - name: Delete tmp helm directory
   become: true
   file:
