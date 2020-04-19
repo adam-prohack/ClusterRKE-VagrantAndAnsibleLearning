@@ -8,7 +8,8 @@ nodes:
   user: vagrant
   docker_socket: /var/run/docker.sock
   ssh_key_path: /home/vagrant/.ssh/id_rsa
-  labels: {}
+  labels:
+    app: dns
 {% for worker_node_ip in worker_nodes_ips %}
 - address: {{ worker_node_ip }}
   port: "22"
@@ -73,3 +74,10 @@ cluster_name: "rke-cluster"
 addon_job_timeout: 0
 restore:
   restore: false
+dns:
+  provider: coredns
+  node_selector:
+    app: dns
+  upstreamnameservers:
+    - 8.8.8.8
+    - 8.8.4.4
