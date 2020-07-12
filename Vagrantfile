@@ -40,7 +40,7 @@ Vagrant.configure("2") do |config|
                 provider.memory = 1024 * 4
                 provider.cpus = 2
             end
-            worker_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.#{200+node_id}"
+            worker_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.#{200+node_id}", bridge: "eno1"
             worker_node.vm.network "forwarded_port", guest: 22, host: 3100+node_id, id: 'ssh'
             worker_node.vm.hostname = "#{MACHINE_HOSTNAME_PREFIX}-node-#{node_id}"
         end
@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
             provider.memory = 1024 * 5
             provider.cpus = 2
         end
-        master_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.200"
+        master_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.200", bridge: "eno1"
         master_node.vm.network "forwarded_port", guest: 22, host: 3100, id: 'ssh'
         master_node.vm.hostname = "#{MACHINE_HOSTNAME_PREFIX}-master"
     end
