@@ -14,3 +14,5 @@
     - 'python-docker'
 - name: Include docker install tasks
   include: docker.yml
+- name: Include setup network tasks
+  include: network.yml

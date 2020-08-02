@@ -1,6 +1,7 @@
 Vagrant.require_version ">= 2.2"
 
 NETWORK_NAME = "rke-cluster"
+NETWORK_BRIDGE_INTERFACE = "eno1"
 NETWORK_IP_BASE = "192.168.0"
 MACHINE_HOSTNAME_PREFIX = "rke"
 WORKER_NODES = 2
@@ -40,7 +41,7 @@ Vagrant.configure("2") do |config|
                 provider.memory = 1024 * 4
                 provider.cpus = 2
             end
-            worker_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.#{200+node_id}", bridge: "eno1"
+            worker_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.#{200+node_id}", bridge: "#{NETWORK_BRIDGE_INTERFACE}"
             worker_node.vm.network "forwarded_port", guest: 22, host: 3100+node_id, id: 'ssh'
             worker_node.vm.hostname = "#{MACHINE_HOSTNAME_PREFIX}-node-#{node_id}"
         end
@@ -52,7 +53,7 @@ Vagrant.configure("2") do |config|
             provider.memory = 1024 * 5
             provider.cpus = 2
         end
-        master_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.200", bridge: "eno1"
+        master_node.vm.network "public_network", ip: "#{NETWORK_IP_BASE}.200", bridge: "#{NETWORK_BRIDGE_INTERFACE}"
         master_node.vm.network "forwarded_port", guest: 22, host: 3100, id: 'ssh'
         master_node.vm.hostname = "#{MACHINE_HOSTNAME_PREFIX}-master"
     end
